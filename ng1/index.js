@@ -1,14 +1,16 @@
 angular.module('app', [])
-  .directive('simpleDirective', SimpleDirective);
+  .directive('simple', SimpleDirective);
 
 
 
 function SimpleDirective() {
   return {
     restrict: 'E',
-    template: '<div>{{greeting}}</div>',
-    controller: function($scope) {
-      $scope.greeting = "Hello World";
-    }
+    template: '<div>{{vm.greeting}}</div>',
+    controller: function() {
+      this.greeting = "Hello World";
+    },
+    controllerAs: 'vm'
   }
-}
+};
+
