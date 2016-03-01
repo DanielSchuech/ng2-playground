@@ -1,4 +1,4 @@
 node_modules
 typings
-**/*.js
-app/**/*.js.map
+ng2/**/*.js
+ng2/**/*.js.map
