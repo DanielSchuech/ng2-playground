@@ -16,18 +16,7 @@
     <script src="node_modules/angular2/bundles/angular2.dev.js"></script>
     <script src="node_modules/angular2/bundles/upgrade.js"></script>
 
-    <!-- 2. Load AngularJS -->
-    <script type="text/javascript" src="/node_modules/angular/angular.js"></script>
-    <!--<script>
-      directives = [];
-      angular.module = function(app, requires) {
-        this.directive = function(selector, fn) {console.log('yes')
-          directives.push({selector: selector, fn: fn});
-        };
-        
-        return this;
-      }
-    </script>  -->
+   
     <script src="/ng1/index.js"></script>
 
     <!-- 3. Configure SystemJS -->
@@ -40,16 +29,13 @@
           }
         }
       });
-      System.import('ng2/app.component')
+      System.import('ng2/main')
             .then(null, console.error.bind(console));
     </script>
   </head>
   
   <!-- 4. Display the application -->
-  <body ng-controller="ctrl">
-    <simple></simple>
-    <!--<my-ng2-component></my-ng2-component>-->
-    {{test}}
-    <div my-highlight my-var="test">in NG1</div>
+  <body>
+    <my-ng2-component></my-ng2-component>
   </body>
 </html>
