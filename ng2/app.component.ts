@@ -1,54 +1,40 @@
 import {Component, Directive, ElementRef, Input} from 'angular2/core';
 import {UpgradeAdapter} from 'angular2/upgrade';
-
-@Directive({
-  selector: 'highlightcmp'
-})
-export class HighlightCmp {
-  constructor(private el: ElementRef) {
-    console.log(el.nativeElement);
-  }
-}
-
-@Directive({
-  selector: 'testing'
-})
-export class Testing{
-  constructor() {
-    console.log('hi')
-  }
-}
+import {EventService} from './event.service';
 
 let upgradeAdapter = new UpgradeAdapter();
 const SimpleDirective = upgradeAdapter.upgradeNg1Component('simple'); 
 const Highlight = upgradeAdapter.upgradeNg1Component('highlight');
 
 @Directive({
-    selector: '[myHighlight]'
+    selector: '[myHighlight]',
+    providers: [EventService]
 })
 export class HighlightDirective {
   @Input('myVar') myVar: string;
   
-  constructor(el: ElementRef) {debugger
+  constructor(event: EventService, el: ElementRef) {
       el.nativeElement.style.backgroundColor = 'yellow';
-      console.log('myVar = '+this.myVar)
+      console.log('myVar = ' + this.myVar)
       this.myVar = 'world';
       
+      event.event.subscribe((data: string) => {
+        el.nativeElement.textContent = data;
+      });
   }
 }
 
 @Component({
     selector: 'my-ng2-component',
     template: '<h1>My First Angular 2 App</h1>' +
-      '<simple></simple><div highlight>test</div>' +
-      '<div myHighlight>ng2Component</div><div testing></div>'
+      '<div myHighlight>ng2Component</div>'
     ,
-    directives: [SimpleDirective, Highlight, HighlightCmp, Testing, HighlightDirective]
+    directives: [SimpleDirective, Highlight, HighlightDirective]
 })
 export class AppComponent {}
 
-angular.module('newApp', ['app'])
-  .controller('ctrl', ['$scope', (scope: any) => {
+let module = angular.module('newApp', ['app']);
+module.controller('ctrl', ['$scope', (scope: any) => {
     scope.test = 'hello';
   }])
   .directive('myNg2Component', <any>upgradeAdapter.downgradeNg2Component(AppComponent))
@@ -65,6 +51,13 @@ function downgradeNG2Directive(directive: any): Function {
     throw new Error();
   }
   
+  // initialise provided services
+  metadata.providers.forEach((provider: Function) => {
+    upgradeAdapter.addProvider(provider);
+    module.factory(getFunctionName(provider), 
+      upgradeAdapter.downgradeNg2Provider(provider));
+  });
+  
   // add bindings to scope
   let bindings = Reflect.getOwnMetadata('propMetadata', directive);
   let bindingKeys = Object.keys(bindings);
@@ -75,7 +68,7 @@ function downgradeNG2Directive(directive: any): Function {
   console.log(scope)
   
   // create directive function
-  function ng1Directive() {
+  function ng1Directive($injector: any) {
     return {
       scope: scope,
       link: (scope: any, element: any, attrs: any) => {
@@ -83,7 +76,24 @@ function downgradeNG2Directive(directive: any): Function {
           nativeElement: element[0]
         };
 
-        directive.apply(scope, [el]);
+        // derivate dependencies
+        let deps: any[] = [];
+        let params: Function[] = Reflect.getMetadata('design:paramtypes', directive);
+        params.forEach((dep: Function) => {debugger
+          let dependencyName = getFunctionName(dep);
+          
+          // ElementRef is a special case 
+          if (dependencyName === 'ElementRef') {
+            deps.push(el);
+            return;
+          } 
+          
+          // default case
+          let dependency = $injector.get(dependencyName);
+          deps.push(dependency);
+        });
+        
+        directive.apply(scope, deps);
       }
     };
   }
@@ -91,5 +101,11 @@ function downgradeNG2Directive(directive: any): Function {
   console.log(directive)
   
   return ng1Directive;
+}
+
+function getFunctionName(fn: Function): string {
+  let name = fn.toString();
+  let reg = /function ([^\(]*)/;
+  return reg.exec(name)[1];
 }
 
