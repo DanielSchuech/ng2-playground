@@ -7,29 +7,44 @@ const SimpleDirective = upgradeAdapter.upgradeNg1Component('simple');
 const Highlight = upgradeAdapter.upgradeNg1Component('highlight');
 
 @Directive({
-    selector: '[myHighlight]',
-    providers: [EventService]
+    selector: '[myHighlightNG2]',
+    providers: [EventService],
+    host: {
+      '(mousemove)': 'onMouseEnter()',
+      '(mouseleave)': 'onMouseLeave()'
+    }
 })
 export class HighlightDirective {
   @Input('myVar') myVar: string;
   
-  constructor(event: EventService, el: ElementRef) {
-      el.nativeElement.style.backgroundColor = 'yellow';
-      console.log('myVar = ' + this.myVar)
-      this.myVar = 'world';
-      
-      event.event.subscribe((data: string) => {
-        el.nativeElement.textContent = data;
-      });
+  constructor(event: EventService, private el: ElementRef) {
+    this.highlight('yellow');
+    console.log('myVar = ' + this.myVar)
+    this.myVar = 'world';
+    
+    event.event.subscribe((data: string) => {
+      el.nativeElement.textContent = data;
+    });
+  }
+  
+  highlight(color: string) {
+    this.el.nativeElement.style.backgroundColor = color;
+  }
+  
+  onMouseEnter() {
+    this.highlight('red');
+  }
+  onMouseLeave() {
+    this.highlight('yellow');
   }
 }
 
 @Component({
     selector: 'my-ng2-component',
     template: '<h1>My First Angular 2 App</h1>' +
-      '<div myHighlight>ng2Component</div>'
+      '<div myHighlightNG2="ng2Highlight">ng2Component</div>'
     ,
-    directives: [SimpleDirective, Highlight, HighlightDirective]
+    directives: [HighlightDirective]
 })
 export class AppComponent {}
 
@@ -75,11 +90,11 @@ function downgradeNG2Directive(directive: any): Function {
         let el: ElementRef = {
           nativeElement: element[0]
         };
-
+        
         // derivate dependencies
         let deps: any[] = [];
         let params: Function[] = Reflect.getMetadata('design:paramtypes', directive);
-        params.forEach((dep: Function) => {debugger
+        params.forEach((dep: Function) => {
           let dependencyName = getFunctionName(dep);
           
           // ElementRef is a special case 
@@ -93,7 +108,24 @@ function downgradeNG2Directive(directive: any): Function {
           deps.push(dependency);
         });
         
-        directive.apply(scope, deps);
+        // combine scope and prototype functions
+        let directiveScope = angular.extend({}, scope, directive.prototype);
+        directive.apply(directiveScope, deps);
+        
+        // add hosts binding to element
+        let hostKeys = Object.keys(metadata.host);
+        hostKeys.forEach((key) => {
+          let keyReg = /([A-Z,a-z,0-9]+)/;
+          let event = keyReg.exec(key)[0];
+          
+          let fnReg = /([A-Z,a-z,0-9]+)/;
+          let fnName = fnReg.exec(metadata.host[key])[0];
+          
+          element[0].addEventListener(event, (event: any) => {
+            directiveScope[fnName]();
+          });
+          
+        });
       }
     };
   }
