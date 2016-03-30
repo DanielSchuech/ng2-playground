@@ -1,20 +1,40 @@
-import {Component, Directive, ElementRef} from 'angular2/core';
+import {Component, Directive, ElementRef, Input} from 'angular2/core';
 
 @Directive({
-    selector: '[myHighlightNG2]'
+    selector: '[myHighlight]',
+    host: {
+      '(mousemove)': 'onMouseEnter()',
+      '(mouseleave)': 'onMouseLeave()'
+    }
 })
 export class HighlightDirective {
+  @Input('myVar') myVar: string;
   
-  constructor(el: ElementRef) {
-    el.nativeElement.style.backgroundColor = 'yellow';
+  //@Input('myHighlight') highlightColor: string;
+  
+  constructor(private el: ElementRef) {
+    this.highlight('yellow');
+    console.log('myVar = ' + this.myVar)
+    this.myVar = 'world';
+  }
+  
+  highlight(color: string) {
+    this.el.nativeElement.style.backgroundColor = color;
+  }
+  
+  onMouseEnter() {
+    this.highlight('red');
+  }
+  onMouseLeave() {
+    this.highlight('yellow');
   }
 }
 
 @Component({
     selector: 'my-ng2-component',
     template: '<h1>My First Angular 2 App</h1>' +
-      '<div>test</div>' +
-      '<div [myHighlightNG2]>test Highlgiht</div>',
+      '<div myHighlight [myVar]="\'test\'">ng2Component</div>'
+    ,
     directives: [HighlightDirective]
 })
 export class AppComponent {}

@@ -15,6 +15,7 @@
     <script src="node_modules/rxjs/bundles/Rx.js"></script>
     <script src="node_modules/angular2/bundles/angular2.dev.js"></script>
     <script src="node_modules/angular2/bundles/upgrade.js"></script>
+    
 
     <!-- 2. Load AngularJS -->
     <script type="text/javascript" src="/node_modules/angular/angular.js"></script>
@@ -37,7 +38,13 @@
           ng2: {
             format: 'register',
             defaultExtension: 'js'
+          },
+          ngAdapter: {
+            defaultExtension: 'js'
           }
+        },
+        map: {
+          ngAdapter: 'node_modules/ngAdapter'
         }
       });
       System.import('ng2/app.component')
