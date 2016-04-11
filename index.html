@@ -19,17 +19,6 @@
 
     <!-- 2. Load AngularJS -->
     <script type="text/javascript" src="/node_modules/angular/angular.js"></script>
-    <!--<script>
-      directives = [];
-      angular.module = function(app, requires) {
-        this.directive = function(selector, fn) {console.log('yes')
-          directives.push({selector: selector, fn: fn});
-        };
-        
-        return this;
-      }
-    </script>  -->
-    <script src="/ng1/index.js"></script>
 
     <!-- 3. Configure SystemJS -->
     <script>
@@ -53,10 +42,8 @@
   </head>
   
   <!-- 4. Display the application -->
-  <body ng-controller="ctrl">
+  <body>
     <simple></simple>
     <my-ng2-component></my-ng2-component>
-    {{test}}
-    <div my-highlight my-var="test">in NG1</div>
   </body>
 </html>
