@@ -10,7 +10,7 @@ import {ngAdapter} from 'ngAdapter/build/ngAdapter';
 @Directive({
     selector: '[myHighlight]',
     host: {
-      '(mousemove)': 'onMouseEnter()',
+      '(mouseenter)': 'onMouseEnter()',
       '(mouseleave)': 'onMouseLeave()'
     }
 })

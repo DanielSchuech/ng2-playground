@@ -14,7 +14,8 @@ function HighlightDirective(event: EventService, test: ng1TestService) {
     scope: {
       myVar: '='
     },
-    link: (scope: any, element: any, attrs: any) => {scope.myVar = 'newVar'
+    link: (scope: any, element: any, attrs: any) => {
+      scope.myVar = 'newVar'
       element[0].style.backgroundColor = 'Yellow';
       
       event.event.subscribe((data: string) => {
@@ -31,12 +32,20 @@ function HighlightDirective(event: EventService, test: ng1TestService) {
   }
 }
 
-let module = angular.module('newApp', ['app']);
+function HighlightDirective2() {
+  return {
+    link: (scope: any, element: any, attrs: any) => {
+      element[0].style.backgroundColor = 'Green';
+    }
+  }
+}
+
+let module = angular.module('newApp', []);
 
 module.service('ng1TestService', ng1TestService); 
 
 let adapter = new ngAdapter(module);
-adapter.upgradeNg1Provider('ng1TestService'); 
+adapter.upgradeNg1Provider('ng1TestService');
 adapter.addProvider(EventService);
 
 module.controller('ctrl', ['$scope', (scope: any) => {
@@ -46,16 +55,18 @@ module.controller('ctrl', ['$scope', (scope: any) => {
 
   
 module.directive('myHighlight', HighlightDirective);
-
+module.directive('myHighlight2', HighlightDirective2);
 
 @Component({
     selector: 'my-ng2-component',
     template: '<h1>My First Angular 2 App</h1>' +
       '{{testVar}}' +
-      '<div myHighlight [(myVar)]="testVar">ng2Component</div>'
+      '<div myHighlight [(myVar)]="testVar">ng2Component</div>' +
+      '<div myHighlight2>2. Directive</div>'
     ,
     providers: [EventService],
-    directives: [adapter.upgradeNg1Directive('myHighlight')]
+    directives: [adapter.upgradeNg1Directive('myHighlight'),
+      adapter.upgradeNg1Directive('myHighlight2')]
 })
 export class AppComponent {
   public testVar: string = "myTest"
