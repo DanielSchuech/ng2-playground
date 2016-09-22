@@ -1,5 +1,5 @@
-import {Component, Directive, ElementRef, Input} from 'angular2/core';
-import {UpgradeAdapter} from 'angular2/upgrade';
+import {Component, Directive, ElementRef, Input, NgModule} from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
 import {EventService} from './event.service';
 
 import {ngAdapter} from 'ngAdapter/build/ngAdapter'; 
@@ -14,7 +14,7 @@ function HighlightDirective(event: EventService, test: ng1TestService) {
     scope: {
       myVar: '='
     },
-    link: (scope: any, element: any, attrs: any) => {
+    link: (scope: any, element: any, attrs: any) => {console.log('link HighlightDirective')
       scope.myVar = 'newVar'
       element[0].style.backgroundColor = 'Yellow';
       
@@ -40,13 +40,13 @@ function HighlightDirective2() {
   }
 }
 
-let module = angular.module('newApp', []);
+let module = angular.module('newApp', ['AppModule']);
 
 module.service('ng1TestService', ng1TestService); 
 
 let adapter = new ngAdapter(module);
 adapter.upgradeNg1Provider('ng1TestService');
-adapter.addProvider(EventService);
+// adapter.addProvider(EventService);
 
 module.controller('ctrl', ['$scope', (scope: any) => {
     scope.test = 'hello';
@@ -63,16 +63,23 @@ module.directive('myHighlight2', HighlightDirective2);
       '{{testVar}}' +
       '<div myHighlight [(myVar)]="testVar">ng2Component</div>' +
       '<div myHighlight2>2. Directive</div>'
-    ,
-    providers: [EventService],
-    directives: [adapter.upgradeNg1Directive('myHighlight'),
-      adapter.upgradeNg1Directive('myHighlight2')]
 })
 export class AppComponent {
   public testVar: string = "myTest"
 }
 
-module.directive('myNg2Component', <any>adapter.downgradeNg2Component(AppComponent));
+@NgModule({
+  imports: [BrowserModule],
+  declarations: [
+    adapter.upgradeNg1Directive('myHighlight'),
+    adapter.upgradeNg1Directive('myHighlight2'),
+    AppComponent],
+  exports: [AppComponent],
+  providers: [EventService]
+})
+class AppModule {}
+adapter.addNg2Module(AppModule);
+adapter.downgradeNg2Module(AppModule);
 
 adapter.bootstrap(document.body, ['newApp']);
 

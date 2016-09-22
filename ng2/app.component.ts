@@ -1,5 +1,4 @@
-import {Component, Directive, ElementRef, Input} from 'angular2/core';
-import {UpgradeAdapter} from 'angular2/upgrade';
+import {Component, Directive, ElementRef, Input, NgModule} from '@angular/core';
 import {EventService} from './event.service';
 
 import {ngAdapter} from 'ngAdapter/build/ngAdapter'; 
@@ -44,15 +43,20 @@ export class HighlightDirective {
     template: '<h1>My First Angular 2 App</h1>' +
       '<div myHighlight [myVar]="\'ng2Highlight\'">ng2Component</div>'
     ,
-    providers: [EventService],
-    
-    directives: [HighlightDirective]
+    providers: [EventService]
 })
 export class AppComponent {}
 
+@NgModule({
+  declarations: [AppComponent],
+  bootstrap: [AppComponent]
+})
+export class AppModule {}
+
+
 let module = angular.module('newApp', ['app']);
 let adapter = new ngAdapter(module);
-adapter.addProvider(EventService);
+// adapter.addProvider(EventService);
 
 module.controller('ctrl', ['$scope', (scope: any) => {
     scope.test = 'hello';
@@ -61,4 +65,4 @@ module.controller('ctrl', ['$scope', (scope: any) => {
   .factory('EventService', <any>adapter.downgradeNg2Provider(EventService))
   .directive('myHighlight', <any>adapter.downgradeNg2Directive(HighlightDirective));
 
-adapter.bootstrap(document.body, ['newApp']);
+// adapter.bootstrap(document.body, ['newApp']);

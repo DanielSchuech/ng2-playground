@@ -1,4 +1,5 @@
-import {Component, Directive, ElementRef, Input} from 'angular2/core';
+import {Component, Directive, ElementRef, Input, NgModule} from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
 
 @Directive({
     selector: '[myHighlight]',
@@ -34,7 +35,12 @@ export class HighlightDirective {
     selector: 'my-ng2-component',
     template: '<h1>My First Angular 2 App</h1>' +
       '<div myHighlight [myVar]="\'test\'">ng2Component</div>'
-    ,
-    directives: [HighlightDirective]
 })
 export class AppComponent {}
+
+@NgModule({
+  imports: [BrowserModule],
+  declarations: [HighlightDirective, AppComponent],
+  bootstrap: [AppComponent]
+})
+export class AppModule {}

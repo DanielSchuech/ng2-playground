@@ -8,29 +8,61 @@
     <!-- IE required polyfills, in this exact order -->
     <script src="node_modules/es6-shim/es6-shim.min.js"></script>
     <script src="node_modules/systemjs/dist/system-polyfills.js"></script>
-    <script src="node_modules/angular2/es6/dev/src/testing/shims_for_IE.js"></script>   
 
-    <script src="node_modules/angular2/bundles/angular2-polyfills.js"></script>
+    <script src="node_modules/zone.js/dist/zone.js"></script>
+    <script src="node_modules/reflect-metadata/Reflect.js"></script>
     <script src="node_modules/systemjs/dist/system.src.js"></script>
     <script src="node_modules/rxjs/bundles/Rx.js"></script>
-    <script src="node_modules/angular2/bundles/angular2.dev.js"></script>
-    <script src="node_modules/angular2/bundles/upgrade.js"></script>
+    <!--<script src="node_modules/@angular/core/bundles/core.umd.js"></script>
+    <script src="node_modules/@angular/common/bundles/common.umd.js"></script>
+    <script src="node_modules/@angular/compiler/bundles/compiler.umd.js"></script>
+    <script src="node_modules/@angular/platform-browser/bundles/platform-browser.umd.js"></script>
+    <script src="node_modules/@angular/platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js"></script>-->
 
    
-    <script src="/ng1/index.js"></script>
+    <!--<script src="/ng1/index.js"></script>-->
 
     <!-- 3. Configure SystemJS -->
     <script>
       System.config({
-        packages: {        
+        paths: {
+          // paths serve as alias
+          'npm:': 'node_modules/'
+        },
+        // map tells the System loader where to look for things
+        map: {
+          // our app is within the app folder
+          app: 'app',
+          // angular bundles
+          '@angular/core': 'npm:@angular/core/bundles/core.umd.js',
+          '@angular/common': 'npm:@angular/common/bundles/common.umd.js',
+          '@angular/compiler': 'npm:@angular/compiler/bundles/compiler.umd.js',
+          '@angular/platform-browser': 'npm:@angular/platform-browser/bundles/platform-browser.umd.js',
+          '@angular/platform-browser-dynamic': 'npm:@angular/platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js',
+          // '@angular/http': 'npm:@angular/http/bundles/http.umd.js',
+          // '@angular/router': 'npm:@angular/router/bundles/router.umd.js',
+          // '@angular/forms': 'npm:@angular/forms/bundles/forms.umd.js',
+          // other libraries
+          'rxjs':                       'npm:rxjs',
+          'angular2-in-memory-web-api': 'npm:angular2-in-memory-web-api',
+        },
+        // packages tells the System loader how to load when no filename and/or no extension
+        packages: {
           ng2: {
-            format: 'register',
+            main: './main.js',
+            defaultExtension: 'js'
+          },
+          rxjs: {
+            defaultExtension: 'js'
+          },
+          'angular2-in-memory-web-api': {
+            main: './index.js',
             defaultExtension: 'js'
           }
         }
-      });
-      System.import('ng2/main')
-            .then(null, console.error.bind(console));
+      })
+
+      System.import('ng2').catch(function(err){ console.error(err); });
     </script>
   </head>
   
